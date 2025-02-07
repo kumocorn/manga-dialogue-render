@@ -5,13 +5,14 @@ import {
 	TextComponent,
 	ButtonComponent,
 	setIcon,
+	App,
 } from "obsidian";
 import * as path from "path";
 import { nanoid } from "nanoid";
 
 const id = nanoid();
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: PluginSettings = {
 	characters: [],
 };
 
@@ -30,8 +31,8 @@ export default class MangaDialoguePlugin extends Plugin {
 	styleEl: HTMLStyleElement;
 
 	async onload() {
-		console.log("Manga-Dialogue-Plugin Loaded");
-		await this.loadSettings(); // settingsがロードされるまで待つ
+		console.log("Manga-Dialogue-Render Loaded");
+		await this.loadSettings();
 		this.loadStylesheet("font.css");
 		this.styleEl = document.createElement("style");
 		document.head.appendChild(this.styleEl);
@@ -50,120 +51,156 @@ export default class MangaDialoguePlugin extends Plugin {
 			source.split("\n").forEach((line) => {
 				if (line.trim() === "") return;
 
-				// コメント行の処理
 				if (line.trim().startsWith("#")) {
-					const commentText = line.trim().substring(1).trim();
-					const commentBubble = document.createElement("div");
-					commentBubble.classList.add("serihu-comment");
-
-					const commentContent = document.createElement("div");
-					commentContent.classList.add("serihu-comment-text");
-					commentContent.textContent = commentText;
-
-					commentBubble.appendChild(commentContent);
-					dialogueContainer.appendChild(commentBubble);
-
-					// コメントが入ったら次の台詞を新しいコンテナにする
+					renderComment(line, dialogueContainer);
 					currentContainer = null;
 					return;
 				}
 
-				// キャラクター名の指定
 				const charMatch = line.match(/^(left|right):\s*(.*)$/);
 				if (charMatch) {
-					const [, position, character] = charMatch;
-					if (position === "left") {
-						leftCharacter = character;
-					} else if (position === "right") {
-						rightCharacter = character;
-					}
+					[leftCharacter, rightCharacter] = updateCharacter(
+						charMatch,
+						leftCharacter,
+						rightCharacter
+					);
 					return;
 				}
 
-				// 台詞行の処理
-				const match = line.match(
-					/^([<>]{1,2}|\(|\))\s*(?::([a-zA-Z0-9_-]+))?\s(.+)$/
-				);
-				if (!match) {
-					return;
-				}
+				const dialogueData = parseDialogue(line);
+				if (!dialogueData) return;
 
-				const [, prefix, fontType, dialogue] = match;
-
-				let position: "left" | "right" =
-					prefix.includes(">") || prefix === ")" ? "right" : "left";
-
-				// 吹き出しの種類
-				let bubbleTypeClass = "";
-				if (prefix === "<<" || prefix === ">>") {
-					bubbleTypeClass = "rough";
-				} else if (prefix === "(" || prefix === ")") {
-					bubbleTypeClass = "thout";
-				}
-
-				// キャラ名を取得
+				const { position, bubbleTypeClass, fontType, dialogue } =
+					dialogueData;
 				const character =
 					position === "right" ? rightCharacter : leftCharacter;
-				const characterEntry = this.settings.characters.find(
-					(c) => c.name === character
+				const characterID =
+					this.settings.characters.find((c) => c.name === character)
+						?.id || null;
+
+				currentContainer = getOrCreateCharacterContainer(
+					dialogueContainer,
+					currentContainer,
+					character,
+					lastCharacter,
+					position,
+					characterID
 				);
-
-				let characterID = null;
-				if (characterEntry) {
-					characterID = characterEntry.id;
-				}
-
-				// コンテナークラスの追加
-				const containerClass =
-					position === "right"
-						? "character-container-right"
-						: "character-container-left";
-				if (!currentContainer || character !== lastCharacter) {
-					currentContainer = document.createElement("div");
-					currentContainer.classList.add(containerClass);
-
-					if (characterID) {
-						currentContainer.classList.add(characterID);
-					}
-
-					dialogueContainer.appendChild(currentContainer);
-				}
-
-				// 吹き出し作成
-				const bubble = document.createElement("div");
-				bubble.classList.add("serihu-bubble", position);
-				if (bubbleTypeClass) {
-					bubble.classList.add(bubbleTypeClass);
-				}
-
-				// キャラ名の表示（最初の発話のみ）
-				if (character !== lastCharacter) {
-					const charName = document.createElement("div");
-					charName.classList.add("serihu-char");
-					charName.textContent = character;
-					bubble.appendChild(charName);
-				}
-
-				// 台詞の追加
-				const text = document.createElement("div");
-				text.classList.add("serihu-text");
-				if (fontType) {
-					text.classList.add(`type-${fontType}`);
-				}
-
-				text.textContent = dialogue;
-				bubble.appendChild(text);
-				currentContainer.appendChild(bubble);
-
+				createBubble(
+					currentContainer,
+					character,
+					dialogue,
+					fontType,
+					bubbleTypeClass,
+					lastCharacter
+				);
 				lastCharacter = character;
 			});
 
 			el.appendChild(dialogueContainer);
 		});
+
+		function renderComment(line: string, parent: HTMLElement) {
+			const commentText = line.trim().substring(1).trim();
+			const commentBubble = document.createElement("div");
+			commentBubble.classList.add("serihu-comment");
+
+			const commentContent = document.createElement("div");
+			commentContent.classList.add("serihu-comment-text");
+			commentContent.textContent = commentText;
+
+			commentBubble.appendChild(commentContent);
+			parent.appendChild(commentBubble);
+		}
+
+		function updateCharacter(
+			charMatch: RegExpMatchArray,
+			left: string,
+			right: string
+		): [string, string] {
+			const [, position, character] = charMatch;
+			if (position === "left") return [character, right];
+			return [left, character];
+		}
+
+		function parseDialogue(line: string) {
+			const match = line.match(
+				/^([<>]{1,2}|\(|\))\s*(?::([a-zA-Z0-9_-]+))?\s(.+)$/
+			);
+			if (!match) return null;
+
+			const [, prefix, fontType, dialogue] = match;
+			const position: "left" | "right" =
+				prefix.includes(">") || prefix === ")" ? "right" : "left";
+
+			let bubbleTypeClass = "";
+			if (prefix === "<<" || prefix === ">>") bubbleTypeClass = "rough";
+			else if (prefix === "(" || prefix === ")")
+				bubbleTypeClass = "thought";
+
+			return { position, bubbleTypeClass, fontType, dialogue };
+		}
+
+		function getOrCreateCharacterContainer(
+			parent: HTMLElement,
+			container: HTMLElement | null,
+			character: string,
+			lastCharacter: string,
+			position: "left" | "right",
+			characterID: string | null
+		) {
+			if (container && character === lastCharacter) return container;
+
+			const newContainer = document.createElement("div");
+			newContainer.classList.add(
+				position === "right"
+					? "character-container-right"
+					: "character-container-left"
+			);
+
+			if (characterID) newContainer.classList.add(characterID);
+			parent.appendChild(newContainer);
+
+			return newContainer;
+		}
+
+		function createBubble(
+			container: HTMLElement,
+			character: string,
+			dialogue: string,
+			fontType: string | undefined,
+			bubbleTypeClass: string,
+			lastCharacter: string
+		) {
+			const bubble = document.createElement("div");
+			bubble.classList.add(
+				"serihu-bubble",
+				container.classList.contains("character-container-right")
+					? "right"
+					: "left"
+			);
+
+			if (bubbleTypeClass) bubble.classList.add(bubbleTypeClass);
+
+			if (character !== lastCharacter) {
+				const charName = document.createElement("div");
+				charName.classList.add("serihu-char");
+				charName.textContent = character;
+				bubble.appendChild(charName);
+			}
+
+			const text = document.createElement("div");
+			text.classList.add("serihu-text");
+			if (fontType) text.classList.add(`type-${fontType}`);
+			text.textContent = dialogue;
+			bubble.appendChild(text);
+
+			container.appendChild(bubble);
+		}
 	}
 
 	onunload() {
-		console.log("Manga-Dialogue-Plugin Unloaded");
+		console.log("Manga-Dialogue-Render Unloaded");
 		this.saveCustomCSS();
 		document.head.removeChild(this.styleEl);
 	}
@@ -182,7 +219,10 @@ export default class MangaDialoguePlugin extends Plugin {
 		this.updateCustomStylesheet();
 	}
 
-	async getAssetPath(filename: string, forReading: boolean = true): Promise<string> {
+	async getAssetPath(
+		filename: string,
+		forReading: boolean = true
+	): Promise<string> {
 		const fullPath = `skin/${filename}`;
 
 		if (forReading) {
@@ -239,7 +279,7 @@ export default class MangaDialoguePlugin extends Plugin {
 
 	async updateStyles() {
 		const cssContent = this.generateCustomStyles();
-		await this.saveStylesheet("color.css", cssContent);
+		await this.saveStylesheet("color.css", await cssContent);
 		this.updateCharacterClasses();
 	}
 
@@ -268,7 +308,7 @@ export default class MangaDialoguePlugin extends Plugin {
 
 	async updateCustomStylesheet() {
 		const cssContent = this.generateCustomStyles();
-		await this.saveStylesheet("color.css", cssContent);
+		await this.saveStylesheet("color.css", await cssContent);
 		await this.loadCustomColorStylesheet();
 	}
 
@@ -276,7 +316,7 @@ export default class MangaDialoguePlugin extends Plugin {
 		await this.loadStylesheet("color.css");
 	}
 
-	async generateCustomStyles(): string {
+	async generateCustomStyles(): Promise<string> {
 		let rootCss = ":root {\n";
 		let customCss = "";
 
@@ -285,13 +325,13 @@ export default class MangaDialoguePlugin extends Plugin {
 		const templatePath = await this.getAssetPath("_color.tpl", true);
 		const response = await fetch(templatePath);
 		if (!response.ok) {
-		  console.error("Failed to load template:", response.statusText);
-		  return "";
+			console.error("Failed to load template:", response.statusText);
+			return "";
 		}
 		const template = await response.text();
 
 		this.settings.characters.forEach((char) => {
-			if (uniqueIds.has(char.id)) return; // すでに同じIDがある場合はスキップ
+			if (uniqueIds.has(char.id)) return;
 			uniqueIds.add(char.id);
 
 			rootCss += `  --${char.id}-color: ${char.color}; /* ${char.name} */ \n`;
@@ -313,7 +353,7 @@ export default class MangaDialoguePlugin extends Plugin {
 class MangaDialogueSettingTab extends PluginSettingTab {
 	plugin: MangaDialoguePlugin;
 
-	constructor(app: any, plugin: MangaDialoguePlugin) {
+	constructor(app: App, plugin: MangaDialoguePlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -322,7 +362,13 @@ class MangaDialogueSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		// キャラクター追加
+		this.createCharacterInput(containerEl);
+
+		containerEl.createEl("h4", { text: "Character List" });
+		this.createCharacterList(containerEl);
+	}
+
+	private createCharacterInput(containerEl: HTMLElement): void {
 		let inputValue = "";
 		let textInput: TextComponent;
 
@@ -335,92 +381,91 @@ class MangaDialogueSettingTab extends PluginSettingTab {
 					(value) => (inputValue = value)
 				);
 			})
-
-		.addButton((button) =>
-			button
-				.setIcon("user-plus")
-				.setTooltip("Add character")
-				.onClick(async () => {
-					if (inputValue.trim() === "") return;
-					if (
-						this.plugin.settings.characters.some(
-							(char) => char.name === inputValue
-						)
-					)
-					return;
-
-					const newID = `characterID-${nanoid(6)}`;
-
-					this.plugin.settings.characters.push({
-						name: inputValue,
-						color: "#ffffff",
-						id: newID,
-					});
-
-					await this.plugin.saveSettings();
-
-					textInput.setValue("");
-
-					this.display();
-				})
-		);
-
-		containerEl.createEl("h4", { text: "Character List" });
-
-		const editingCharacters: Set<string> = new Set(); // characterIDで管理
-
-		this.plugin.settings.characters.forEach((char, index) => {
-			let setting = new Setting(containerEl);
-
-			let nameSpan = setting.nameEl.createEl("span", { text: char.name });
-
-			setting.addColorPicker((picker) =>
-				picker.setValue(char.color).onChange(async (value) => {
-					this.plugin.settings.characters[index].color = value;
-					await this.plugin.saveSettings();
-				})
-			);
-
-			const textComponent = new TextComponent(setting.controlEl);
-			textComponent.inputEl.style.display = "none";
-
-			const editButton = new ButtonComponent(setting.controlEl)
-				.setIcon("pencil")
-				.setTooltip("Edit Name")
-				.onClick(() => {
-					if (textComponent.inputEl.style.display === "none") {
-						nameSpan.style.display = "none";
-						textComponent.inputEl.style.display = "";
-						textComponent.setValue(nameSpan.textContent || "");
-						editButton.setIcon("check").setTooltip("Confirm!");
-					} else {
-						const newName = textComponent.getValue().trim();
-						if (newName !== "") {
-							nameSpan.textContent = newName;
-							// 設定データを更新
-							this.plugin.settings.characters[index].name =
-								newName;
-							this.plugin.saveSettings();
-						}
-						textComponent.inputEl.style.display = "none";
-						nameSpan.style.display = "";
-						editButton
-						.setIcon("pencil")
-						.setTooltip("Edit Name");
-					}
-				});
-
-			setting.addButton((button) =>
+			.addButton((button) =>
 				button
-					.setIcon("user-round-x")
-					.setTooltip("Remove Character")
-					.setWarning()
+					.setIcon("user-plus")
+					.setTooltip("Add character")
 					.onClick(async () => {
-						this.plugin.settings.characters.splice(index, 1);
+						if (inputValue.trim() === "") return;
+						if (
+							this.plugin.settings.characters.some(
+								(char) => char.name === inputValue
+							)
+						)
+							return;
+
+						const newID = `characterID-${nanoid(6)}`;
+
+						this.plugin.settings.characters.push({
+							name: inputValue,
+							color: "#ffffff",
+							id: newID,
+						});
+
 						await this.plugin.saveSettings();
+						textInput.setValue("");
 						this.display();
 					})
 			);
+	}
+
+	private createCharacterList(containerEl: HTMLElement): void {
+		this.plugin.settings.characters.forEach((char, index) => {
+			this.createCharacterSetting(containerEl, char, index);
 		});
+	}
+
+	private createCharacterSetting(
+		containerEl: HTMLElement,
+		char: { name: string; color: string; id: string },
+		index: number
+	): void {
+		const setting = new Setting(containerEl);
+
+		const nameSpan = setting.nameEl.createEl("span", { text: char.name });
+
+		setting.addColorPicker((picker) =>
+			picker.setValue(char.color).onChange(async (value) => {
+				this.plugin.settings.characters[index].color = value;
+				await this.plugin.saveSettings();
+			})
+		);
+
+		const textComponent = new TextComponent(setting.controlEl);
+		textComponent.inputEl.style.display = "none";
+
+		const editButton = new ButtonComponent(setting.controlEl)
+			.setIcon("pencil")
+			.setTooltip("Edit Name")
+			.onClick(() => {
+				if (textComponent.inputEl.style.display === "none") {
+					nameSpan.style.display = "none";
+					textComponent.inputEl.style.display = "";
+					textComponent.setValue(nameSpan.textContent || "");
+					editButton.setIcon("check").setTooltip("Confirm!");
+				} else {
+					const newName = textComponent.getValue().trim();
+					if (newName !== "") {
+						nameSpan.textContent = newName;
+						this.plugin.settings.characters[index].name = newName;
+						this.plugin.saveSettings();
+					}
+					textComponent.inputEl.style.display = "none";
+					nameSpan.style.display = "";
+					editButton.setIcon("pencil").setTooltip("Edit Name");
+				}
+			});
+
+		setting.addButton((button) =>
+			button
+				.setIcon("user-round-x")
+				.setTooltip("Remove Character")
+				.setWarning()
+				.onClick(async () => {
+					this.plugin.settings.characters.splice(index, 1);
+					await this.plugin.saveSettings();
+					this.display();
+				})
+		);
 	}
 }

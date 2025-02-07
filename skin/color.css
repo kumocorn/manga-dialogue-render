@@ -5,15 +5,16 @@
   --characterID-q9UfIy-color: #f8c2ff; /* 愛流 */ 
   --characterID-mtW3tt-color: #86deea; /* 珠璃 */ 
   --characterID-OdhlR4-color: #fff8a8; /* 則元 */ 
-  --characterID-JfWQFq-color: #ffffff; /* あああ */ 
+  --characterID-JfWQFq-color: #ff0a0a; /* あああ */ 
+  --characterID-FlMmxR-color: #ffb3b3; /* テスト左 */ 
 }
 /* 雪名 - characterID-xaU6AJ */
 .character-container-left.characterID-xaU6AJ .serihu-bubble,
-.character-container-left.characterID-xaU6AJ .serihu-bubble.thout::before,
-.character-container-left.characterID-xaU6AJ .serihu-bubble.thout::after,
+.character-container-left.characterID-xaU6AJ .serihu-bubble.thought::before,
+.character-container-left.characterID-xaU6AJ .serihu-bubble.thought::after,
 .character-container-right.characterID-xaU6AJ .serihu-bubble,
-.character-container-right.characterID-xaU6AJ .serihu-bubble.thout::before,
-.character-container-right.characterID-xaU6AJ .serihu-bubble.thout::after {
+.character-container-right.characterID-xaU6AJ .serihu-bubble.thought::before,
+.character-container-right.characterID-xaU6AJ .serihu-bubble.thought::after {
   background-color: var(--characterID-xaU6AJ-color);
 }
 
@@ -27,11 +28,11 @@
   color: var(--characterID-xaU6AJ-color);
 }/* 陽南 - characterID-Qc5Z6k */
 .character-container-left.characterID-Qc5Z6k .serihu-bubble,
-.character-container-left.characterID-Qc5Z6k .serihu-bubble.thout::before,
-.character-container-left.characterID-Qc5Z6k .serihu-bubble.thout::after,
+.character-container-left.characterID-Qc5Z6k .serihu-bubble.thought::before,
+.character-container-left.characterID-Qc5Z6k .serihu-bubble.thought::after,
 .character-container-right.characterID-Qc5Z6k .serihu-bubble,
-.character-container-right.characterID-Qc5Z6k .serihu-bubble.thout::before,
-.character-container-right.characterID-Qc5Z6k .serihu-bubble.thout::after {
+.character-container-right.characterID-Qc5Z6k .serihu-bubble.thought::before,
+.character-container-right.characterID-Qc5Z6k .serihu-bubble.thought::after {
   background-color: var(--characterID-Qc5Z6k-color);
 }
 
@@ -45,11 +46,11 @@
   color: var(--characterID-Qc5Z6k-color);
 }/* 夢月 - characterID-0t4cEE */
 .character-container-left.characterID-0t4cEE .serihu-bubble,
-.character-container-left.characterID-0t4cEE .serihu-bubble.thout::before,
-.character-container-left.characterID-0t4cEE .serihu-bubble.thout::after,
+.character-container-left.characterID-0t4cEE .serihu-bubble.thought::before,
+.character-container-left.characterID-0t4cEE .serihu-bubble.thought::after,
 .character-container-right.characterID-0t4cEE .serihu-bubble,
-.character-container-right.characterID-0t4cEE .serihu-bubble.thout::before,
-.character-container-right.characterID-0t4cEE .serihu-bubble.thout::after {
+.character-container-right.characterID-0t4cEE .serihu-bubble.thought::before,
+.character-container-right.characterID-0t4cEE .serihu-bubble.thought::after {
   background-color: var(--characterID-0t4cEE-color);
 }
 
@@ -63,11 +64,11 @@
   color: var(--characterID-0t4cEE-color);
 }/* 愛流 - characterID-q9UfIy */
 .character-container-left.characterID-q9UfIy .serihu-bubble,
-.character-container-left.characterID-q9UfIy .serihu-bubble.thout::before,
-.character-container-left.characterID-q9UfIy .serihu-bubble.thout::after,
+.character-container-left.characterID-q9UfIy .serihu-bubble.thought::before,
+.character-container-left.characterID-q9UfIy .serihu-bubble.thought::after,
 .character-container-right.characterID-q9UfIy .serihu-bubble,
-.character-container-right.characterID-q9UfIy .serihu-bubble.thout::before,
-.character-container-right.characterID-q9UfIy .serihu-bubble.thout::after {
+.character-container-right.characterID-q9UfIy .serihu-bubble.thought::before,
+.character-container-right.characterID-q9UfIy .serihu-bubble.thought::after {
   background-color: var(--characterID-q9UfIy-color);
 }
 
@@ -81,11 +82,11 @@
   color: var(--characterID-q9UfIy-color);
 }/* 珠璃 - characterID-mtW3tt */
 .character-container-left.characterID-mtW3tt .serihu-bubble,
-.character-container-left.characterID-mtW3tt .serihu-bubble.thout::before,
-.character-container-left.characterID-mtW3tt .serihu-bubble.thout::after,
+.character-container-left.characterID-mtW3tt .serihu-bubble.thought::before,
+.character-container-left.characterID-mtW3tt .serihu-bubble.thought::after,
 .character-container-right.characterID-mtW3tt .serihu-bubble,
-.character-container-right.characterID-mtW3tt .serihu-bubble.thout::before,
-.character-container-right.characterID-mtW3tt .serihu-bubble.thout::after {
+.character-container-right.characterID-mtW3tt .serihu-bubble.thought::before,
+.character-container-right.characterID-mtW3tt .serihu-bubble.thought::after {
   background-color: var(--characterID-mtW3tt-color);
 }
 
@@ -99,11 +100,11 @@
   color: var(--characterID-mtW3tt-color);
 }/* 則元 - characterID-OdhlR4 */
 .character-container-left.characterID-OdhlR4 .serihu-bubble,
-.character-container-left.characterID-OdhlR4 .serihu-bubble.thout::before,
-.character-container-left.characterID-OdhlR4 .serihu-bubble.thout::after,
+.character-container-left.characterID-OdhlR4 .serihu-bubble.thought::before,
+.character-container-left.characterID-OdhlR4 .serihu-bubble.thought::after,
 .character-container-right.characterID-OdhlR4 .serihu-bubble,
-.character-container-right.characterID-OdhlR4 .serihu-bubble.thout::before,
-.character-container-right.characterID-OdhlR4 .serihu-bubble.thout::after {
+.character-container-right.characterID-OdhlR4 .serihu-bubble.thought::before,
+.character-container-right.characterID-OdhlR4 .serihu-bubble.thought::after {
   background-color: var(--characterID-OdhlR4-color);
 }
 
@@ -117,11 +118,11 @@
   color: var(--characterID-OdhlR4-color);
 }/* あああ - characterID-JfWQFq */
 .character-container-left.characterID-JfWQFq .serihu-bubble,
-.character-container-left.characterID-JfWQFq .serihu-bubble.thout::before,
-.character-container-left.characterID-JfWQFq .serihu-bubble.thout::after,
+.character-container-left.characterID-JfWQFq .serihu-bubble.thought::before,
+.character-container-left.characterID-JfWQFq .serihu-bubble.thought::after,
 .character-container-right.characterID-JfWQFq .serihu-bubble,
-.character-container-right.characterID-JfWQFq .serihu-bubble.thout::before,
-.character-container-right.characterID-JfWQFq .serihu-bubble.thout::after {
+.character-container-right.characterID-JfWQFq .serihu-bubble.thought::before,
+.character-container-right.characterID-JfWQFq .serihu-bubble.thought::after {
   background-color: var(--characterID-JfWQFq-color);
 }
 
@@ -133,4 +134,22 @@
 .character-container-left.characterID-JfWQFq .serihu-char,
 .character-container-right.characterID-JfWQFq .serihu-char {
   color: var(--characterID-JfWQFq-color);
+}/* テスト左 - characterID-FlMmxR */
+.character-container-left.characterID-FlMmxR .serihu-bubble,
+.character-container-left.characterID-FlMmxR .serihu-bubble.thought::before,
+.character-container-left.characterID-FlMmxR .serihu-bubble.thought::after,
+.character-container-right.characterID-FlMmxR .serihu-bubble,
+.character-container-right.characterID-FlMmxR .serihu-bubble.thought::before,
+.character-container-right.characterID-FlMmxR .serihu-bubble.thought::after {
+  background-color: var(--characterID-FlMmxR-color);
+}
+
+.character-container-left.characterID-FlMmxR .serihu-bubble::after,
+.character-container-right.characterID-FlMmxR .serihu-bubble::after {
+  border-color: var(--characterID-FlMmxR-color) transparent transparent;
+}
+
+.character-container-left.characterID-FlMmxR .serihu-char,
+.character-container-right.characterID-FlMmxR .serihu-char {
+  color: var(--characterID-FlMmxR-color);
 }

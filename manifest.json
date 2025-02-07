@@ -1,11 +1,10 @@
 {
-	"id": "test-plugin",
-	"name": "Test plugin",
+	"id": "manga-dialogue-render",
+	"name": "Manga Dialogue Render",
 	"version": "0.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "dialogue plugin test",
+	"description": "Render your characters dialogues in code blocks into manga-style speech bubbles.",
 	"author": "kumocorn",
 	"authorUrl": "https://github.com/kumocorn",
-	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": true
 }

@@ -1,40 +1,44 @@
-import { Plugin } from 'obsidian';
-import { nanoid } from 'nanoid';
-import type { PluginSettings } from './types';
-import { DEFAULT_SETTINGS } from './types';
-import { FileManager } from './utils/file';
-import { generateCustomStyles, updateCharacterClasses } from './utils/styles';
-import { DialogueRenderer } from './components/Dialogue';
-import { MangaDialogueSettingTab } from './components/SettingsTab';
+import { Plugin } from "obsidian";
+import { DialogueRenderer } from "./components/dialogue";
+import { StyleManager } from "./components/styles";
+import { MangaDialogueSettingTab } from "./components/settings";
+import { DEFAULT_SETTINGS, type PluginSettings } from "./components/types";
 
 export default class MangaDialoguePlugin extends Plugin {
   settings: PluginSettings;
-  styleEl: HTMLStyleElement;
-  fileManager: FileManager;
+  private styleManager: StyleManager;
+  private dialogueRenderer: DialogueRenderer;
 
   async onload() {
     console.log("Manga-Dialogue-Plugin Loaded");
-    
-    this.fileManager = new FileManager(this.app, this.manifest.id, this.manifest.dir);
-    
+	console.log("Loading settings...");
     await this.loadSettings();
-    await this.initializeStyles();
+	console.log("Settings loaded:", this.settings);
+    this.styleManager = new StyleManager(this, this.settings);
+    await this.styleManager.initialize();
+    
+    this.dialogueRenderer = new DialogueRenderer(this.settings);
     
     this.addSettingTab(new MangaDialogueSettingTab(this.app, this));
     
-    this.registerMarkdownCodeBlockProcessor("serihu", (source, el, ctx) => {
-      const renderer = new DialogueRenderer(this.settings.characters);
-      renderer.render(source, el);
-    });
+    this.registerMarkdownCodeBlockProcessor(
+      "serihu",
+      (source, el, ctx) => this.dialogueRenderer.render(source, el, ctx)
+    );
   }
 
-  private async initializeStyles(): Promise<void> {
-    await this.fileManager.loadStylesheet("font.css");
-    this.styleEl = document.createElement("style");
-    document.head.appendChild(this.styleEl);
-    await this.updateStyles();
-    await this.fileManager.loadStylesheet("color.css");
+  onunload() {
+    console.log("Manga-Dialogue-Plugin Unloaded");
+    this.styleManager.cleanup();
   }
 
-  // ... 残りのメソッド
+  async loadSettings() {
+	this.settings = Object.assign({ characters: [] }, await this.loadData());
+	console.log("Settings loaded:", this.settings); // デバッグ用
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
+    await this.styleManager.updateStyles();
+  }
 }

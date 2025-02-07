@@ -1,46 +1,58 @@
-現在custom-color.cssには以下のような形でcssが記述されています。
+test-plugin
+│   
+├── components/
+│   ├── dialogue.ts
+│   ├── settings.ts
+│   ├── styles.ts　　　getAssetPathなどCSSの読み書きはここ
+│   └── types.ts
+├── skin/
+│   ├── _color.tpl
+│   ├── color.css
+│   └── font.css
+└── main.ts
 
-```custom-color.css
-:root {
-  --characterID-xaU6AJ-color: #d7effe;
-  --characterID-Qc5Z6k-color: #ffd6e4;
-  --characterID-0t4cEE-color: #f5e5ff;
-  --characterID-q9UfIy-color: #f8c2ff;
-  --characterID-mtW3tt-color: #86deea;
-  --characterID-OdhlR4-color: #fef371;
-  --characterID-L_sxCL-color: #ff9494;
+===
+import { Plugin } from "obsidian";
+import { DialogueRenderer } from "./components/dialogue";
+import { StyleManager } from "./components/styles";
+import { MangaDialogueSettingTab } from "./components/settings";
+import { DEFAULT_SETTINGS, type PluginSettings } from "./components/types";
+
+export default class MangaDialoguePlugin extends Plugin {
+  settings: PluginSettings;
+  private styleManager: StyleManager;
+  private dialogueRenderer: DialogueRenderer;
+
+  async onload() {
+    console.log("Manga-Dialogue-Plugin Loaded");
+	console.log("Loading settings...");
+    await this.loadSettings();
+	console.log("Settings loaded:", this.settings);
+    this.styleManager = new StyleManager(this, this.settings);
+    await this.styleManager.initialize();
+    
+    this.dialogueRenderer = new DialogueRenderer(this.settings);
+    
+    this.addSettingTab(new MangaDialogueSettingTab(this.app, this));
+    
+    this.registerMarkdownCodeBlockProcessor(
+      "serihu",
+      (source, el, ctx) => this.dialogueRenderer.render(source, el, ctx)
+    );
+  }
+
+  onunload() {
+    console.log("Manga-Dialogue-Plugin Unloaded");
+    this.styleManager.cleanup();
+  }
+
+  async loadSettings() {
+	this.settings = Object.assign({ characters: [] }, await this.loadData());
+	console.log("Settings loaded:", this.settings); // デバッグ用
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
+    await this.styleManager.updateStyles();
+  }
 }
-
-/* 雪名-characterID-xaU6AJ */
-...
-			
-/* 陽南-characterID-Qc5Z6k */
-...
-
-/* 夢月-characterID-0t4cEE */
-...
-			
-/* 愛流-characterID-q9UfIy */
-...
-			
-/* 珠璃-characterID-mtW3tt */
-...
-```
-
-これを、:rootを一番上に置くのではなく
-
-```
-/* 雪名-characterID-xaU6AJ */
-:root {--characterID-xaU6AJ-color: #d7effe;}
-...
-```
-このような形にしてもいいのでしょうか？
-
-また、ファイル上部にカスタムプロパティを用いる場合、
-
-```
-:root {
-  --characterID-xaU6AJ-color: #d7effe; /* 雪名 */
-  ...
-```
-という形にした方が管理しやすいでしょうか。

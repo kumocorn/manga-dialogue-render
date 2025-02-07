@@ -1,10 +1,10 @@
 /* {{name}} - {{id}} */
 .character-container-left.{{id}} .serihu-bubble,
-.character-container-left.{{id}} .serihu-bubble.thout::before,
-.character-container-left.{{id}} .serihu-bubble.thout::after,
+.character-container-left.{{id}} .serihu-bubble.thought::before,
+.character-container-left.{{id}} .serihu-bubble.thought::after,
 .character-container-right.{{id}} .serihu-bubble,
-.character-container-right.{{id}} .serihu-bubble.thout::before,
-.character-container-right.{{id}} .serihu-bubble.thout::after {
+.character-container-right.{{id}} .serihu-bubble.thought::before,
+.character-container-right.{{id}} .serihu-bubble.thought::after {
   background-color: var(--{{id}}-color);
 }
 
