@@ -1,8 +1,189 @@
-/*
+:root {
+	--m-d-serihu-text-color: #202020;
+	--m-d-serihu-background: #f7f4ed;
+	--m-d-serihu-border: #000000;
+	--m-d-serihu-name-background:  rgba(150, 100, 220, 0);
+	--m-d-serihu-name-text-color:  rgba(0, 0, 0, 0.6);
+	--m-d-serihu-height: 12em;
+	--m-d-comment-width: 60%;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.serihu-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 80%;
+  margin: 20px auto;
+  padding: 20px auto;
+}
 
-If your plugin does not need CSS, delete this file.
+.character-container-left, .character-container-right {
+  display: flex;
+	flex-direction: row-reverse;
+  gap: 8px;
+  margin:10px;
+}
 
-*/
+.character-container-left {
+  justify-content: flex-end;
+}
+
+.character-container-right {
+  justify-content: flex-start;
+}
+
+
+.serihu-bubble {
+  position: relative;
+  display: inline-block;
+  max-height: var(--m-d-serihu-height);
+  border-radius: 20px;
+  font-size: 16px;
+  white-space: pre-wrap;
+  writing-mode: vertical-rl;
+	line-height: 1.4;
+  border: solid 2px var(--m-d-serihu-border);
+  align-self: flex-start;
+}
+
+.serihu-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  border-style: solid;
+  border-color: var(--m-d-serihu-border) transparent transparent;
+  translate: -50% 100%;
+  transform-origin: top;
+}
+.serihu-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  border-style: solid;
+  translate: calc(-50% - 0.5px) 100%;
+  transform-origin: top;
+  z-index: 1;
+}
+
+.character-container-right .serihu-bubble::before {
+    border-width: 16px 22px 0px 1px;
+    transform: skew(60deg);
+}
+.character-container-left .serihu-bubble::before {
+    border-width: 16px 2px 0px 22px;
+    transform: skew(-60deg);
+}
+
+.character-container-right .serihu-bubble::after {
+  border-width: 14px 19px 0px 0px;
+  transform: skew(60deg);
+}
+
+.character-container-left .serihu-bubble::after {
+  border-width: 14px 0px 0px 19px;
+  transform: skew(-60deg);
+}
+
+/* bubble */
+.serihu-bubble.rough{
+  border-radius: 85% 5% 85% 9% / 5% 85% 5% 90%;
+  border: solid 3px var(--m-d-serihu-border);
+  }
+.serihu-bubble.thout {
+  border-radius: 999px;
+  border: 0;
+  padding: 2%;
+  font-size: 90%;
+  box-shadow: 0px 0px 0px 1px rgba(0,0,0,1);
+  }
+.serihu-bubble.thout::before {
+  content: "";
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  border-style: none;
+  border-color: transparent;
+  border-width: 2px;
+  border-radius: 50%;
+  translate: none;
+  transform: none;
+  }
+.serihu-bubble.thout::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 9px;
+  border-style: none;
+  border-width: 0;
+  border-radius: 50%;
+  translate: none;
+  transform: none;
+  z-index: 1;
+  }
+
+.character-container-right .serihu-bubble.thout::before {
+  bottom: -7px;
+  right: 17px;
+  box-shadow: -2px 2px 0px -1px rgba(0, 0, 0, 1);
+  transform: rotate(-65deg);
+}
+.character-container-left .serihu-bubble.thout::before {
+  bottom: -7px;
+  left: 17px;
+  box-shadow: 2px 2px 0px -1px rgba(0, 0, 0, 1);
+  transform: rotate(65deg);
+}
+
+.character-container-right .serihu-bubble.thout::after {
+  bottom: -13px;
+  right: 4px;
+  box-shadow: 0px 1px 0px 1px rgba(0, 0, 0, 1);
+}
+
+.character-container-left .serihu-bubble.thout::after {
+  bottom: -13px;
+  left: 4px;
+  box-shadow: 0px 1px 0px 1px rgba(0, 0, 0, 1);
+}
+
+.serihu-char {
+  position: absolute;
+  display: inline-block;
+  font-weight: bold;
+  font-size: 1em;
+  background-color: var(--m-d-serihu-border);
+  padding: 1em 2px;
+  border-radius: 20px;
+  border: 2px solid var(--m-d-serihu-text-color);
+  top: -1.8em;
+  right: -1.3em;
+}
+
+.serihu-text {
+  color: var(--m-d-serihu-text-color);
+  font-size: 1em;
+  padding: 1em;
+}
+
+/* 吹き出し背景色の指定 */
+.serihu-bubble,.serihu-bubble.thout::before,.serihu-bubble.thout::after {
+  background-color: var(--m-d-serihu-background);}
+.serihu-bubble::after {border-color: var(--m-d-serihu-background) transparent transparent;}
+.serihu-char{color:var(--m-d-serihu-background);}
+
+/* コメント */
+.serihu-comment {
+    font-family: sans-serif;
+    color: rgba(0, 0, 0, 0.8);
+    margin: 10px auto;
+    max-width: 60%;
+}
+
+.serihu-comment-text {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 0.5em 1em;
+}
+
