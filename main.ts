@@ -33,11 +33,7 @@ export default class MangaDialoguePlugin extends Plugin {
 	async onload() {
 		console.log("Manga-Dialogue-Render Loaded");
 		await this.loadSettings();
-		this.loadStylesheet("font.css");
-		this.styleEl = document.createElement("style");
-		document.head.appendChild(this.styleEl);
-		this.updateStyles();
-		this.loadStylesheet("color.css");
+		this.initializeStyles();
 		this.addSettingTab(new MangaDialogueSettingTab(this.app, this));
 		this.registerMarkdownCodeBlockProcessor("serihu", (source, el, ctx) => {
 			const dialogueContainer = document.createElement("div");
@@ -219,6 +215,19 @@ export default class MangaDialoguePlugin extends Plugin {
 		this.updateCustomStylesheet();
 	}
 
+	initializeStyles() {
+		this.loadStylesheet("font.css");
+		this.styleEl = document.createElement("style");
+		document.head.appendChild(this.styleEl);
+		this.updateStyles();
+		this.loadCSSFiles;
+	}
+
+	async loadCSSFiles() {
+        await this.loadStylesheet("font.css");
+        await this.loadStylesheet("color.css");
+    }
+
 	async getAssetPath(
 		filename: string,
 		forReading: boolean = true
@@ -278,8 +287,7 @@ export default class MangaDialoguePlugin extends Plugin {
 	}
 
 	async updateStyles() {
-		const cssContent = this.generateCustomStyles();
-		await this.saveStylesheet("color.css", await cssContent);
+		await this.saveCustomCSS(false);
 		this.updateCharacterClasses();
 	}
 
@@ -307,12 +315,10 @@ export default class MangaDialoguePlugin extends Plugin {
 	}
 
 	async updateCustomStylesheet() {
-		const cssContent = this.generateCustomStyles();
-		await this.saveStylesheet("color.css", await cssContent);
-		await this.loadCustomColorStylesheet();
-	}
+		await this.saveCustomCSS(true);
+		}
 
-	async loadCustomColorStylesheet() {
+	async loadCustomColorCSS() {
 		await this.loadStylesheet("color.css");
 	}
 
@@ -344,9 +350,12 @@ export default class MangaDialoguePlugin extends Plugin {
 		return rootCss + customCss;
 	}
 
-	async saveCustomCSS() {
+	async saveCustomCSS(reload = false) {
 		const cssText = await this.generateCustomStyles();
 		await this.saveStylesheet("color.css", cssText);
+		if (reload) {
+			await this.loadCustomColorCSS();
+		}
 	}
 }
 
