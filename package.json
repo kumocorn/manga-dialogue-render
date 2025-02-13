@@ -1,5 +1,5 @@
 {
-	"name": "test-plugin",
+	"name": "manga-dialogue-render",
 	"version": "0.0.0",
 	"description": "dialogue plugin test",
 	"main": "main.js",
