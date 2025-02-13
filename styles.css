@@ -1,10 +1,8 @@
 :root {
 	--m-d-serihu-text-color: #202020;
-	--m-d-serihu-background: #f7f4ed;
+	--m-d-serihu-background: #faf5f0;
 	--m-d-serihu-border: #000000;
-	--m-d-serihu-name-background:  rgba(150, 100, 220, 0);
-	--m-d-serihu-name-text-color:  rgba(0, 0, 0, 0.6);
-	--m-d-serihu-height: 12em;
+	--m-d-bubble-height: 12em;
 	--m-d-comment-width: 60%;
 }
 
@@ -15,6 +13,8 @@
   max-width: 80%;
   margin: 20px auto;
   padding: 20px auto;
+  overflow: visible;
+  font-size: var(--font-text-size);
 }
 
 .character-container-left, .character-container-right {
@@ -36,9 +36,8 @@
 .serihu-bubble {
   position: relative;
   display: inline-block;
-  max-height: var(--m-d-serihu-height);
+  max-height: var(--m-d-bubble-height);
   border-radius: 20px;
-  font-size: 16px;
   white-space: pre-wrap;
   writing-mode: vertical-rl;
 	line-height: 1.4;
@@ -95,8 +94,8 @@
   border-radius: 999px;
   border: 0;
   padding: 2%;
-  font-size: 90%;
-  box-shadow: 0px 0px 0px 1px rgba(0,0,0,1);
+  font-size: 1em;
+  box-shadow: 0px 0px 0px 1px var(--m-d-serihu-border);
   }
 .serihu-bubble.thought::before {
   content: "";
@@ -126,27 +125,87 @@
 .character-container-right .serihu-bubble.thought::before {
   bottom: -7px;
   right: 17px;
-  box-shadow: -2px 2px 0px -1px rgba(0, 0, 0, 1);
+  box-shadow: -2px 2px 0px -1px var(--m-d-serihu-border);
   transform: rotate(-65deg);
 }
 .character-container-left .serihu-bubble.thought::before {
   bottom: -7px;
   left: 17px;
-  box-shadow: 2px 2px 0px -1px rgba(0, 0, 0, 1);
+  box-shadow: 2px 2px 0px -1px var(--m-d-serihu-border);
   transform: rotate(65deg);
 }
 
 .character-container-right .serihu-bubble.thought::after {
   bottom: -13px;
   right: 4px;
-  box-shadow: 0px 1px 0px 1px rgba(0, 0, 0, 1);
+  box-shadow: 0px 1px 0px 1px var(--m-d-serihu-border);
 }
 
 .character-container-left .serihu-bubble.thought::after {
   bottom: -13px;
   left: 4px;
-  box-shadow: 0px 1px 0px 1px rgba(0, 0, 0, 1);
+  box-shadow: 0px 1px 0px 1px var(--m-d-serihu-border);
 }
+
+/* uniflash */
+.serihu-bubble.uniflash {
+  position: relative;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(var(--m-d-serihu-background), var(--m-d-serihu-background) 55% 50%,transparent 65%);
+  padding: 1em;
+  margin: 0 0.5em;
+}
+
+.serihu-bubble.uniflash .serihu-text{padding:2em 2.5em;}
+
+.serihu-bubble.uniflash::before,.serihu-bubble.uniflash::after {
+  content: "";
+  position: absolute;
+  border: none;
+  border-radius: 50%;
+  translate: none;
+  transform: none;
+  transform-origin: center;
+  height: 130%;
+  width: 120%;
+  top: -13%;
+}
+
+.serihu-bubble.uniflash::before {
+  z-index: -1;
+  left: -14%;
+  width: 130%;
+  background:
+  radial-gradient(var(--m-d-serihu-background), var(--m-d-serihu-background) 50%,transparent 65%);
+  mask-image:
+  radial-gradient( white 45% ,transparent 55%),
+  repeating-conic-gradient(transparent, transparent 12deg, white 15deg 13deg),
+  repeating-conic-gradient(transparent, transparent 16deg, white 19deg 17deg),
+  repeating-conic-gradient(transparent, transparent 25deg, white 22deg 26deg),
+  repeating-conic-gradient(transparent, transparent 37deg, white 37deg 39deg),
+  repeating-conic-gradient(transparent, transparent 48deg, white 48deg 50deg),
+  repeating-conic-gradient(transparent, transparent 43deg, white 44deg 45deg),
+  repeating-conic-gradient(transparent, transparent 83deg, white 85deg 84deg),
+  repeating-conic-gradient(transparent, transparent 4deg, white 5deg 2deg);
+}
+
+.serihu-bubble.uniflash::after{
+  z-index: 0;
+  left: -10%;
+  transform: rotate(2deg);
+  background:
+  repeating-conic-gradient(transparent, transparent 15deg, var(--m-d-serihu-border) 15deg 16deg), 
+  repeating-conic-gradient(transparent, transparent 19deg, var(--m-d-serihu-border) 19deg 20deg),
+  repeating-conic-gradient(transparent, transparent 22deg, var(--m-d-serihu-border) 22deg 23deg),
+  repeating-conic-gradient(transparent, transparent 34deg, var(--m-d-serihu-border) 34deg 35deg),
+  repeating-conic-gradient(transparent, transparent 45deg, var(--m-d-serihu-border) 45deg 47deg),
+  repeating-conic-gradient(transparent, transparent 48deg, var(--m-d-serihu-border) 49deg 50deg),
+  repeating-conic-gradient(transparent, transparent 80deg, var(--m-d-serihu-border) 80deg 81deg),
+  repeating-conic-gradient(transparent, transparent 3deg, var(--m-d-serihu-border) 5deg 3deg);
+  mask-image: radial-gradient(transparent 40%,white 50%,transparent 70%);
+}
+
 
 .serihu-char {
   position: absolute;
@@ -159,6 +218,7 @@
   border: 2px solid var(--m-d-serihu-text-color);
   top: -1.8em;
   right: -1.3em;
+  z-index: 2;
 }
 
 .serihu-text {
@@ -187,3 +247,101 @@
   padding: 0.5em 1em;
 }
 
+/* font */
+.serihu-text{
+	font-size:0.9em;
+	font-family: var(--dialogue-font);
+	font-weight: 400;
+	font-style: normal;
+	letter-spacing: -0.02em;
+  }
+
+.serihu-char {
+  font-family: "";
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing:0.02em;
+}
+.serihu-comment-text {
+  font-family: "";
+  font-weight: 300;
+  font-style: normal;
+  font-size:0.8em;
+}
+
+.type-monologue {
+	font-family: var(--monologue-font);
+	font-weight: 400;
+	font-style: normal;
+	font-size: 95%;
+}
+
+.type-pop {
+	font-family: var(--pop-font);
+	font-weight: 400;
+	font-style: normal;
+	font-size: 95%;
+}
+
+.type-strong {
+	font-family: var(--strong-font);
+	font-weight: 800;
+	font-style: normal;	  
+}
+
+.type-weak {
+	font-family: var(--weak-font);
+	font-weight: 400;
+	font-style: normal;
+	font-size: 105%;
+}
+
+.type-horror {
+	font-family: var(--horror-font);
+	font-weight: 400;
+	font-style: normal;
+}
+
+/* タブ */
+/* タブの基本スタイル */
+.tab-button {
+    padding: 20px;
+    background-color: var(--background-secondary);
+    border: none !important;
+    border-radius: 5px 5px 0 0 !important;
+    font-size: var(--font-ui-larger);
+    font-weight: bold;
+    box-shadow: none !important;
+    color: var(--text-muted);
+}
+
+/* タブが選択されているときのスタイル */
+.tab-button.active {
+  background-color: var(--interactive-accent);
+  color: var(--background-primary);
+}
+
+/* ホバー時のスタイル */
+.tab-button:hover {
+  background-color: var(--background-modifier-active-hover);  /* ホバー時の背景色 */
+  color: var(--text-normal);
+}
+
+/* タブのコンテナ */
+.tab-content-container {
+  display: flex;
+  justify-content: flex-start;
+  border-bottom: 2px solid var(--interactive-normal); /* タブの下線 */
+}
+
+/* タブの中身（選択されたタブ） */
+.tab-content {
+  display: none;
+  padding-top: 1.2em;
+  border-top: 3px solid var(--interactive-accent);
+}
+
+/* アクティブなタブコンテンツを表示 */
+.tab-content.active {
+  display: block;
+}

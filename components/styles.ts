@@ -1,142 +1,173 @@
-import { Plugin, Setting } from "obsidian";
-import type { PluginSettings } from "./types";
-import path from "path";
+import { App, PluginManifest } from "obsidian";
+import { CharacterSettings, PluginSettings } from "./types";
+import { getAssetPath } from "./utils";
 
 export class StyleManager {
-  private styleEl: HTMLStyleElement;
-  private plugin: Plugin;
-  private settings: PluginSettings; // 追加
+	private app: App;
+	private settings: PluginSettings;
+	private manifest: PluginManifest;
 
-  constructor(plugin: Plugin, settings: PluginSettings) { // settings を受け取る
-    this.plugin = plugin; // ここで明示的にセット
-    this.styleEl = document.createElement("style");
-    console.log("StyleManager initialized with settings:", this.settings); // ← デバッグ用
-    this.styleEl = document.createElement("style");
-    document.head.appendChild(this.styleEl);
-    console.log("StyleManager initialized with plugin:", this.plugin); // 追加
-  }
+	constructor(app: App, settings: PluginSettings, manifest: PluginManifest) {
+		this.app = app;
+		this.settings = settings;
+		this.manifest = manifest;
+	}
 
-  async initialize() {
-    await this.loadStylesheet("font.css");
-    await this.updateStyles();
-    await this.loadStylesheet("color.css");
-  }
-
-  async loadStylesheet(filename: string) {
-    const cssPath = await this.getAssetPath(filename, true);
-    try {
-      const response = await fetch(cssPath);
-      if (!response.ok) {
-        console.error(`Failed to load ${filename}:`, response.statusText);
-        return;
-      }
-
-      const cssText = await response.text();
-      const style = document.createElement("style");
-      style.textContent = cssText;
-      document.head.appendChild(style);
-    } catch (err) {
-      console.error(`Failed to fetch ${filename}:`, err);
-    }
-  }
-
-  async saveStylesheet(filename: string, cssText: string) {
-    console.log("this.plugin:", this.plugin); // ← ここで確認
-    console.log("this.plugin.app:", this.plugin?.app); // ← ここで確認
-		const pluginPath = await this.getAssetPath(filename, false);
+	private async loadTemplate(): Promise<string> {
+		const templatePath = await getAssetPath(
+			this.app,
+			this.manifest,
+			"_color.tpl",
+			true
+		);
 		try {
-			const dirPath = path.dirname(pluginPath);
-			const dirExists = await this.app.vault.adapter.exists(dirPath);
-			if (!dirExists) {
-				await this.app.vault.adapter.mkdir(dirPath);
-			}
-
-			await this.app.vault.adapter.write(pluginPath, await cssText);
+			const response = await fetch(templatePath);
+			return response.ok ? await response.text() : "";
 		} catch (err) {
-			console.error(`Failed to save ${filename}:`, err);
+			console.error("Error loading template:", err);
+			return "";
 		}
 	}
 
-  async updateStyles() {
-    console.log("Updating styles with settings:", this.plugin.settings); // デバッグ用
-    const cssContent = await this.generateCustomStyles();
-    await this.saveStylesheet("color.css", cssContent);
-    this.updateCharacterClasses();
-  }
+	private generateCharacterCss(template: string): {
+		rootCss: string;
+		customCss: string;
+	} {
+		const uniqueIds = new Set<string>();
+		let rootCss = ":root {\n";
+		let customCss = "";
 
-	async updateCharacterClasses() {
-    console.log("this.settings.characters:", this.settings.characters); // ← デバッグ用
+		this.settings.characters.forEach((char) => {
+			if (uniqueIds.has(char.id)) return;
+			uniqueIds.add(char.id);
 
-      if (!this.settings || !this.settings.characters) {
-        console.error("Error: settings or characters is undefined");
-        return;
-      }
-
-      const characterContainers = document.querySelectorAll(
-        ".character-container-left, .character-container-right"
-      );
-      characterContainers.forEach((container) => {
-        container.classList.forEach((cls) => {
-          if (cls.startsWith("characterID-")) {
-            container.classList.remove(cls);
-          }
-        });
-
-			const characterName = container
-				.querySelector(".serihu-char")
-				?.textContent?.trim();
-			if (!characterName) return;
-
-			const characterID =
-				this.settings.characters.find((c) => c.name === characterName)
-					?.id || "default";
-			container.classList.add(characterID);
+			const { varName, variable } = this.generateColorVariable(char, false); // `false` で !important なし
+			rootCss += `  ${varName}: ${variable}\n`;
+			customCss += this.createCustomCss(char, template);
 		});
+
+		return { rootCss, customCss };
 	}
 
-  private async getAssetPath(filename: string, forReading: boolean = true): Promise<string> {
-    const fullPath = `skin/${filename}`;
-    if (forReading) {
-      return this.plugin.app.vault.adapter.getResourcePath(
-        `${this.plugin.manifest.dir}/${fullPath}`
-      );
-    }
-    return path.join(
-      ".obsidian",
-      "plugins",
-      this.plugin.manifest.id,
-      fullPath
-    );
-  }
+	private createCustomCss(char: CharacterSettings, template: string): string {
+		return template
+			.replace(/{{id}}/g, char.id)
+			.replace(/{{name}}/g, char.name);
+	}
 
-  private async generateCustomStyles(): Promise<string> {
-    let rootCss = ":root {\n";
-    let customCss = "";
-    const uniqueIds = new Set<string>();
+	async generateCustomStyles(): Promise<string> {
+		const template = await this.loadTemplate();
 
-    const templatePath = await this.getAssetPath("_color.tpl", true);
-    const response = await fetch(templatePath);
-    if (!response.ok) {
-      console.error("Failed to load template:", response.statusText);
-      return "";
-    }
-    const template = await response.text();
+		if (!template) {
+			console.warn("Template is empty or could not be loaded.");
+			return "";
+		}
 
-    this.plugin.settings.characters.forEach((char) => {
-      if (uniqueIds.has(char.id)) return;
-      uniqueIds.add(char.id);
+		const { rootCss, customCss } = this.generateCharacterCss(template);
 
-      rootCss += `  --${char.id}-color: ${char.color}; /* ${char.name} */ \n`;
-      customCss += template
-        .replace(/{{id}}/g, char.id)
-        .replace(/{{name}}/g, char.name);
-    });
+		return `${rootCss}}\n${customCss}`;
+	}
 
-    rootCss += "}\n";
-    return rootCss + customCss;
-  }
+	private generateColorVariable(char: CharacterSettings, withImportant: boolean): { varName: string; variable: string } {
+		const varName = `--characterID-${char.id}-color`;
+		const colorValue = withImportant ? `${char.color} !important` : char.color; //trueで!important
+		const characterName = `/* ${char.name} */`;
+		const variable = `${colorValue}; ${characterName}`;
 
-  cleanup() {
-    document.head.removeChild(this.styleEl);
-  }
+		return { varName, variable };
+	}
+
+	applyCustomStyles(updatedCharacters?: CharacterSettings[]) {
+		const settings = this.settings;
+
+		let styleEl = document.getElementById(
+			"dialogue-custom-style"
+		) as HTMLStyleElement;
+		if (!styleEl) {
+			styleEl = document.createElement("style");
+			styleEl.id = "dialogue-custom-style";
+			document.head.appendChild(styleEl);
+		}
+
+		const setCssVar = (varName: string, value: string) =>
+			value && value.trim() !== "" ? `${varName}: ${value};` : "";
+
+		const quoteFont = (font: string) => `"${font}"`;
+
+		const newRootCss = `
+    \n     /* Appearance */
+    ${[
+		setCssVar("--m-d-serihu-text-color", settings.textColor),
+		setCssVar("--m-d-serihu-background", settings.backgroundColor),
+		setCssVar("--m-d-serihu-border", settings.borderColor),
+		setCssVar("--m-d-bubble-height", settings.bubbleHeight),
+		setCssVar("--m-d-comment-width", settings.commentWidth),
+	]
+		.filter(Boolean)
+		.join("\n    ")}  
+
+  /* Font */
+    --dialogue-font: ${quoteFont(settings.defaultFont || "Shippori Antique")};
+    --monologue-font: ${quoteFont(settings.monologueFont || "源柔ゴシック")};
+    --pop-font: ${quoteFont(settings.popFont || "Mochiy Pop One")};
+    --strong-font: ${quoteFont(settings.strongFont || "源暎エムゴv2")};
+    --weak-font: ${quoteFont(settings.weakFont || "851チカラヨワク")};
+    --horror-font: ${quoteFont(
+		settings.horrorFont || "g_コミックホラー恐怖-教漢"
+	)};
+
+  /* Characters */
+  `.trim();
+
+		const characters =
+			updatedCharacters && updatedCharacters.length > 0
+				? updatedCharacters
+				: this.settings.characters;
+
+		const characterColors = characters
+			.map(
+				(char) =>
+					`  --characterID-${char.id}-color: ${char.color} !important; /* ${char.name} */`
+			)
+			.join("\n  ");
+
+		styleEl.textContent = `:root {\n  ${newRootCss}\n  ${characterColors}\n}`;
+	}
+
+	updateCharacterColor(updatedCharacters: CharacterSettings[]) {
+		let styleEl = document.getElementById("dialogue-custom-style") as HTMLStyleElement;
+    if (!styleEl) {
+			styleEl = document.createElement("style");
+			styleEl.id = "dialogue-custom-style";
+			document.head.appendChild(styleEl);
+		}
+
+		const existingStyle = styleEl.textContent || "";
+
+		const rootMatch = existingStyle.match(/:root\s*{([\s\S]*?)}/);
+		let rootCss = rootMatch ? rootMatch[1].trim() : "";
+
+		const existingCharacterCssMatches = rootCss.match(/--characterID-[\w-]+-color:\s*#[\da-fA-F]+ !important;\s*\/\*.*?\*\//g) || [];
+		const existingCharacterCssMap: Record<string, string> = {};
+
+		existingCharacterCssMatches.forEach((match) => {
+			const idMatch = match.match(/--characterID-([\w-]+)-color:/);
+			if (idMatch) {
+				const charId = idMatch[1];
+				existingCharacterCssMap[charId] = match;
+			}
+		});
+
+		updatedCharacters.forEach((character) => {
+			const updatedColor = character.color;
+
+			existingCharacterCssMap[
+				character.id
+			] = `--characterID-${character.id}-color: ${updatedColor} !important; /* ${character.name} */`;
+		});
+
+		const newCharacterCss = Object.values(existingCharacterCssMap).join("\n  ");
+
+		styleEl.textContent = `:root {\n  ${newCharacterCss}\n}`;
+	}
 }

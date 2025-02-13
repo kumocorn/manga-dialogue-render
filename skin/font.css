@@ -1,56 +1,62 @@
-/* GoogleFontsを使用する場合はこの行を削除してください。下はフォントの一例です。
-@import url('https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Kiwi+Maru:wght&family=Mochiy+Pop+One&family=New+Tegomin&family=Shippori+Antique&family=Yuji+Boku&family=Zen+Kaku+Gothic+Antique:wght@700&family=Zen+Maru+Gothic:wght@400;500&display=swap');
-上はフォントの一例です。GoogleFontsを使用する場合はこの行を削除してください */
+:root {
+	--dialogue-font: 'Shippori Antique', '源暎アンチック v5', 'びぜんアンチック', serif;
+	--monologue-font: '源柔ゴシック', sans-serif;
+	--pop-font: 'Mochiy Pop One', '源暎ぽっぷる';
+	--strong-font: '源暎エムゴv2', sans-serif;
+	--weak-font: '851チカラヨワク', '851CHIKARA-YOWAKU';
+	--horror-font: 'g_コミックホラー恐怖-教漢';
+  }
 
 .serihu-text{
 	font-size:0.9em;
-	font-family: "Shippori Antique",'源暎アンチック v5','源暎アンチック v4','07やさしさアンチック','F910新コミック体','びぜんアンチック','Iwata Antic Std B';
+	font-family: var(--dialogue-font);
 	font-weight: 400;
 	font-style: normal;
 	letter-spacing: -0.02em;
   }
 
 .serihu-char {
-  font-family: "Kiwi Maru";
-  font-weight: 500;
+  font-family: "";
+  font-weight: 700;
   font-style: normal;
   letter-spacing:0.02em;
 }
 .serihu-comment-text {
-  font-family: "Zen Maru Gothic";
-  font-weight: 400;
+  font-family: "";
+  font-weight: 300;
   font-style: normal;
-  font-size:0.9em;
+  font-size:0.8em;
 }
 
 .type-monologue {
-	font-family: '源柔ゴシック',"Zen Maru Gothic";
+	font-family: var(--monologue-font);
 	font-weight: 400;
 	font-style: normal;
 	font-size: 95%;
 }
+
+.type-pop {
+	font-family: var(--pop-font);
+	font-weight: 400;
+	font-style: normal;
+	font-size: 95%;
+}
+
 .type-strong {
-	font-family: '源暎エムゴv2',"Zen Kaku Gothic Antique";
+	font-family: var(--strong-font);
 	font-weight: 800;
 	font-style: normal;	  
 }
 
-.type-pop {
-	font-family: 'Mochiy Pop One','源暎ぽっぷる';
-	font-weight: 400;
-	font-style: normal;
-	font-size: 95%;
-}
-
 .type-weak {
-	font-family: '851チカラヨワク', '851CHIKARA-YOWAKU';
+	font-family: var(--weak-font);
 	font-weight: 400;
 	font-style: normal;
 	font-size: 105%;
 }
 
 .type-horrer {
-	font-family: "New Tegomin","Hina Mincho",'g_コミックホラー恐怖-教漢';
+	font-family: var(--horror-font);
 	font-weight: 400;
 	font-style: normal;
 }

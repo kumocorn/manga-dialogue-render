@@ -1,150 +1,235 @@
-import { MarkdownPostProcessorContext } from "obsidian";
-import type { PluginSettings } from "./types";
+import type { PluginSettings, CharacterSettings } from "./types";
+import { loadStylesheet } from "./utils";
+import {
+	App,
+	PluginSettingTab,
+	Setting,
+	TextComponent,
+	ButtonComponent,
+	PluginManifest,
+} from "obsidian";
 
-export class DialogueRenderer {
-  constructor(private settings: PluginSettings) {}
+export class MangaDialogueRenderer {
+	private plugin: any;
+	private source: string;
+	private el: HTMLElement;
+	private settings: PluginSettings;
+  private manifest: PluginManifest;
+  private app: App;
 
-  render(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
-    const dialogueContainer = document.createElement("div");
-    dialogueContainer.classList.add("serihu-container");
+  constructor(plugin: any, source: string, el: HTMLElement) {
+    this.plugin = plugin;
+    this.settings = plugin.settings;
+    this.source = source;
+    this.el = el;
+    this.render();
+  }
+  
+	private render() {
+		const dialogueContainer = document.createElement("div");
+		dialogueContainer.classList.add("serihu-container");
 
-    let leftCharacter = "";
-    let rightCharacter = "";
-    let lastCharacter = "";
-    let currentContainer: HTMLElement | null = null;
+		let leftCharacter = "";
+		let rightCharacter = "";
+		let lastCharacter = "";
+		let currentContainer: HTMLElement | null = null;
 
-    source.split("\n").forEach((line) => {
-      if (line.trim() === "") return;
+		this.source.split("\n").forEach((line: string) => {
 
-      if (this.renderComment(line, dialogueContainer)) {
-        currentContainer = null;
-        return;
-      }
+			if (line.trim() === "") return;
 
-      const charPosition = this.renderCharacterPosition(line);
-      if (charPosition) {
-        if (charPosition.position === "left") {
-          leftCharacter = charPosition.character;
+			if (line.trim().startsWith("#")) {
+				this.renderComment(line, dialogueContainer);
+				currentContainer = null;
+				return;
+			}
+
+			const charMatch = line.match(/^(left|right):\s*(.*)$/);
+			if (charMatch) {
+				[leftCharacter, rightCharacter] = this.updateCharacter(
+					charMatch,
+					leftCharacter,
+					rightCharacter
+				);
+				return;
+			}
+
+			const dialogueData = this.parseDialogue(line);
+			if (!dialogueData) return;
+
+			const { position, bubbleTypeClass, fontType, dialogue } =
+				dialogueData;
+			const character =
+				position === "right" ? rightCharacter : leftCharacter;
+			const characterID = this.getCharacterID(character);
+
+			currentContainer = this.getOrCreateCharacterContainer(
+				dialogueContainer,
+				currentContainer,
+				character,
+				lastCharacter,
+				position,
+				characterID
+			);
+			this.createBubble(
+				currentContainer,
+				character,
+				dialogue,
+				fontType,
+				bubbleTypeClass,
+				lastCharacter
+			);
+			lastCharacter = character;
+		});
+
+		this.el.appendChild(dialogueContainer);
+	}
+
+	private renderComment(line: string, parent: HTMLElement) {
+		const commentText = line.trim().substring(1).trim();
+		const commentSection = document.createElement("div");
+		commentSection.classList.add("serihu-comment");
+
+		const commentContent = document.createElement("div");
+		commentContent.classList.add("serihu-comment-text");
+		commentContent.textContent = commentText;
+
+		commentSection.appendChild(commentContent);
+		parent.appendChild(commentSection);
+	}
+
+	private updateCharacter(
+		charMatch: RegExpMatchArray,
+		left: string,
+		right: string
+	): [string, string] {
+		const [, position, character] = charMatch;
+		return position === "left" ? [character, right] : [left, character];
+	}
+
+	private parseDialogue(line: string) {
+		const match = line.match(/^([<>]{1,2}|\(\(|\)\)|\(|\))\s*(?::([a-zA-Z0-9_-]+))?\s(.+)$/);
+
+		if (!match) return null;
+
+		const [, prefix, fontType, dialogue] = match;
+		const position = this.getPositionFromPrefix(prefix);
+		const bubbleTypeClass = this.getBubbleTypeClass(prefix);
+
+		return { position, bubbleTypeClass, fontType, dialogue };
+	}
+
+	private getPositionFromPrefix(prefix: string): "left" | "right" {
+		switch (prefix) {
+			case ">":
+			case ">>":
+			case ")":
+      case "))":
+				return "right";
+			default:
+				return "left";
+		}
+	}
+
+	private getBubbleTypeClass(prefix: string): string {
+		switch (prefix) {
+			case "<<":
+			case ">>":
+				return "rough";
+			case "(":
+			case ")":
+				return "thought";
+      case "((":
+      case "))":
+        return "uniflash";
+			default:
+				return "";
+		}
+	}
+
+	private getOrCreateCharacterContainer(
+		parent: HTMLElement,
+		container: HTMLElement | null,
+		character: string,
+		lastCharacter: string,
+		position: "left" | "right",
+		characterID: string | null
+	) {
+		if (container && character === lastCharacter) return container;
+
+		const newContainer = document.createElement("div");
+		newContainer.classList.add(`character-container-${position}`);
+
+		if (characterID) newContainer.classList.add(`characterID-${characterID}`);
+		parent.appendChild(newContainer);
+
+		return newContainer;
+	}
+
+	private createBubble(
+		container: HTMLElement,
+		character: string,
+		dialogue: string,
+		fontType: string | undefined,
+		bubbleTypeClass: string,
+		lastCharacter: string
+	) {
+
+		const bubble = document.createElement("div");
+		bubble.classList.add(
+			"serihu-bubble",
+			container.classList.contains("character-container-right")
+				? "right"
+				: "left"
+		);
+
+		if (bubbleTypeClass) bubble.classList.add(bubbleTypeClass);
+
+		character !== lastCharacter &&
+			(() => {
+				const charName = document.createElement("div");
+				charName.classList.add("serihu-char");
+				charName.textContent = character;
+				bubble.appendChild(charName);
+			})();
+
+		const text = document.createElement("div");
+		text.classList.add("serihu-text");
+		if (fontType) text.classList.add(`type-${fontType}`);
+		text.textContent = dialogue;
+		bubble.appendChild(text);
+
+		container.appendChild(bubble);
+	}
+
+	// コンテナへのクラスの再付与
+	updateCharacterClasses() {
+		document
+			.querySelectorAll("[class^='character-container-']")
+			.forEach((container) => {
+        const classListArray = Array.from(container.classList);
+        classListArray.forEach((cls) => {
+            if (cls.startsWith("characterID-")) {
+                container.classList.remove(cls);
+            }
+        });
+
+				const characterName = container
+					.querySelector(".serihu-char")
+					?.textContent?.trim();
+				if (!characterName) return;
+
+        const characterID = this.getCharacterID(characterName);
+        console.log(`Character name: ${characterName}, Character ID: ${characterID}`);
+        if (characterID) {
+            container.classList.add(`characterID-${characterID}`);
         } else {
-          rightCharacter = charPosition.character;
+            console.warn(`No character ID found for: ${characterName}`);
         }
-        return;
-      }
-
-      this.renderDialogueLine(
-        line,
-        dialogueContainer,
-        leftCharacter,
-        rightCharacter,
-        lastCharacter,
-        currentContainer
-      );
     });
+	}
 
-    el.appendChild(dialogueContainer);
-  }
-
-  private renderComment(line: string, container: HTMLElement): boolean {
-    if (!line.trim().startsWith("#")) return false;
-
-    const commentText = line.trim().substring(1).trim();
-    const commentBubble = document.createElement("div");
-    commentBubble.classList.add("serihu-comment");
-
-    const commentContent = document.createElement("div");
-    commentContent.classList.add("serihu-comment-text");
-    commentContent.textContent = commentText;
-
-    commentBubble.appendChild(commentContent);
-    container.appendChild(commentBubble);
-    return true;
-  }
-
-  private renderCharacterPosition(line: string): { position: string; character: string } | null {
-    const charMatch = line.match(/^(left|right):\s*(.*)$/);
-    if (!charMatch) return null;
-    return {
-      position: charMatch[1],
-      character: charMatch[2]
-    };
-  }
-
-  private renderDialogueLine(
-    line: string,
-    container: HTMLElement,
-    leftCharacter: string,
-    rightCharacter: string,
-    lastCharacter: string,
-    currentContainer: HTMLElement | null
-  ) {
-    const match = line.match(/^([<>]{1,2}|\(|\))\s*(?::([a-zA-Z0-9_-]+))?\s(.+)$/);
-    if (!match) return;
-
-    const [, prefix, fontType, dialogue] = match;
-    const position: "left" | "right" = prefix.includes(">") || prefix === ")" ? "right" : "left";
-    const character = position === "right" ? rightCharacter : leftCharacter;
-
-    const bubbleTypeClass = this.getBubbleTypeClass(prefix);
-    const characterEntry = this.settings.characters.find(c => c.name === character);
-    const characterID = characterEntry?.id;
-
-    this.createDialogueBubble(
-      container,
-      position,
-      character,
-      characterID,
-      bubbleTypeClass,
-      fontType,
-      dialogue,
-      lastCharacter
-    );
-  }
-
-  private getBubbleTypeClass(prefix: string): string {
-    if (prefix === "<<" || prefix === ">>") return "rough";
-    if (prefix === "(" || prefix === ")") return "thout";
-    return "";
-  }
-
-  private createDialogueBubble(
-    container: HTMLElement,
-    position: "left" | "right",
-    character: string,
-    characterID: string | undefined,
-    bubbleTypeClass: string,
-    fontType: string | undefined,
-    dialogue: string,
-    lastCharacter: string
-  ) {
-    const containerClass = `character-container-${position}`;
-    const dialogueContainer = document.createElement("div");
-    dialogueContainer.classList.add(containerClass);
-    if (characterID) {
-      dialogueContainer.classList.add(characterID);
-    }
-
-    const bubble = document.createElement("div");
-    bubble.classList.add("serihu-bubble", position);
-    if (bubbleTypeClass) {
-      bubble.classList.add(bubbleTypeClass);
-    }
-
-    if (character !== lastCharacter) {
-      const charName = document.createElement("div");
-      charName.classList.add("serihu-char");
-      charName.textContent = character;
-      bubble.appendChild(charName);
-    }
-
-    const text = document.createElement("div");
-    text.classList.add("serihu-text");
-    if (fontType) {
-      text.classList.add(`type-${fontType}`);
-    }
-    text.textContent = dialogue;
-    bubble.appendChild(text);
-
-    dialogueContainer.appendChild(bubble);
-    container.appendChild(dialogueContainer);
-  }
+	getCharacterID(name: string): string | null {
+		return this.plugin.settings.characters.find((c: CharacterSettings) => c.name === name)?.id || null;
+	}
 }
