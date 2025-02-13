@@ -99,9 +99,9 @@ They are not preinstalled fonts, so you must install your own typeface or change
 
 #####  ✍External characters
 
-Half-width characters are oriented horizontally,  
-so characters such as `!` and `?` We recommend you to use Unicode `‼` `⁇` `⁈` `⁉` to join two `!`  
-Use `〰` or `⌇` to join wavy lines.
+Half-width characters will be oriented horizontally.  
+so when writing two `!` or `?`, it is recommended to use Unicode `‼` `⁇` `⁈` `⁉`.
+Use `〰` or `⌇` to join long wavy lines.
  
 If you have specified "Shippori Antique" or "GenEi Font", you can use this tool to copy external characters.  
 [しっぽり明朝ほか 外字簡単入力ツール](https://donutland.jp/edl/shippori-copier/)  
