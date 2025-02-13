@@ -5,7 +5,6 @@ export interface CharacterSettings {
 }
 
 export interface PluginSettings {
-  characters: CharacterSettings[];
   textColor: string;
   backgroundColor: string;
   borderColor:  string;
@@ -17,10 +16,10 @@ export interface PluginSettings {
   strongFont: string;
   weakFont: string;
   horrorFont: string;
+  characters: CharacterSettings[];
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
-  characters: [],
   textColor: "#202020",
   backgroundColor: "#faf5f0",
   borderColor: "#000000",
@@ -32,4 +31,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   strongFont: "",
   weakFont: "",
   horrorFont: "",
+  characters: [],
 };

@@ -1,11 +1,6 @@
 import type { PluginSettings, CharacterSettings } from "./types";
-import { loadStylesheet } from "./utils";
 import {
 	App,
-	PluginSettingTab,
-	Setting,
-	TextComponent,
-	ButtonComponent,
 	PluginManifest,
 } from "obsidian";
 
@@ -14,8 +9,6 @@ export class MangaDialogueRenderer {
 	private source: string;
 	private el: HTMLElement;
 	private settings: PluginSettings;
-  private manifest: PluginManifest;
-  private app: App;
 
   constructor(plugin: any, source: string, el: HTMLElement) {
     this.plugin = plugin;
@@ -38,7 +31,7 @@ export class MangaDialogueRenderer {
 
 			if (line.trim() === "") return;
 
-			if (line.trim().startsWith("#")) {
+			if (line.trim().startsWith("# ")) {
 				this.renderComment(line, dialogueContainer);
 				currentContainer = null;
 				return;

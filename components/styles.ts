@@ -112,8 +112,7 @@ export class StyleManager {
     --pop-font: ${quoteFont(settings.popFont || "Mochiy Pop One")};
     --strong-font: ${quoteFont(settings.strongFont || "源暎エムゴv2")};
     --weak-font: ${quoteFont(settings.weakFont || "851チカラヨワク")};
-    --horror-font: ${quoteFont(
-		settings.horrorFont || "g_コミックホラー恐怖-教漢"
+    --horror-font: ${quoteFont(settings.horrorFont || "g_コミックホラー恐怖-教漢"
 	)};
 
   /* Characters */

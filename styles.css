@@ -169,7 +169,7 @@
   transform-origin: center;
   height: 130%;
   width: 120%;
-  top: -13%;
+  top: -15%;
 }
 
 .serihu-bubble.uniflash::before {
@@ -210,12 +210,13 @@
 .serihu-char {
   position: absolute;
   display: inline-block;
+  padding: 1em 2px;
   font-weight: bold;
   font-size: 1em;
   background-color: var(--m-d-serihu-border);
-  padding: 1em 2px;
   border-radius: 20px;
   border: 2px solid var(--m-d-serihu-text-color);
+  height: max-content;
   top: -1.8em;
   right: -1.3em;
   z-index: 2;
@@ -285,7 +286,7 @@
 
 .type-strong {
 	font-family: var(--strong-font);
-	font-weight: 800;
+	font-weight: 900;
 	font-style: normal;	  
 }
 

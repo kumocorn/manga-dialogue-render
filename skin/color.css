@@ -5,8 +5,10 @@
   --characterID-q9UfIy-color: #f8c2ff; /* 愛流 */
   --characterID-mtW3tt-color: #86deea; /* 珠璃 */
   --characterID-OdhlR4-color: #edcc54; /* 則元 */
-  --characterID-FGLxXs-color: #ff5c5c; /* 太郎 */
-  --characterID-y9m6iM-color: #ff3333; /* 花子 */
+  --characterID-FGLxXs-color: #b2cadc; /* 太郎 */
+  --characterID-y9m6iM-color: #f8a5ba; /* 花子 */
+  --characterID-YROPUO-color: #ff7300; /* 悟空 */
+  --characterID-qOWicP-color: #c29afe; /* フリーザ */
 }
 /* 雪名 - characterID-xaU6AJ */
 .character-container-left.characterID-xaU6AJ .serihu-bubble,
@@ -246,5 +248,65 @@
 .character-container-left.characterID-y9m6iM .serihu-char,
 .character-container-right.characterID-y9m6iM .serihu-char {
   color: var(--characterID-y9m6iM-color);
+}
+
+/* 悟空 - characterID-YROPUO */
+.character-container-left.characterID-YROPUO .serihu-bubble,
+.character-container-left.characterID-YROPUO .serihu-bubble.thought::before,
+.character-container-left.characterID-YROPUO .serihu-bubble.thought::after,
+.character-container-right.characterID-YROPUO .serihu-bubble,
+.character-container-right.characterID-YROPUO .serihu-bubble.thought::before,
+.character-container-right.characterID-YROPUO .serihu-bubble.thought::after {
+  background-color: var(--characterID-YROPUO-color);
+}
+
+.character-container-left.characterID-YROPUO .serihu-bubble.uniflash,
+.character-container-right.characterID-YROPUO .serihu-bubble.uniflash {
+  background: radial-gradient(var(--characterID-YROPUO-color), var(--characterID-YROPUO-color) 55% 50%,transparent 65%);
+}
+
+.character-container-left.characterID-YROPUO .serihu-bubble.uniflash::before,
+.character-container-right.characterID-YROPUO .serihu-bubble.uniflash::before {
+  background: radial-gradient(var(--characterID-YROPUO-color), var(--characterID-YROPUO-color) 50%,transparent 65%);
+}
+
+.character-container-left.characterID-YROPUO .serihu-bubble::after,
+.character-container-right.characterID-YROPUO .serihu-bubble::after {
+  border-color: var(--characterID-YROPUO-color) transparent transparent;
+}
+
+.character-container-left.characterID-YROPUO .serihu-char,
+.character-container-right.characterID-YROPUO .serihu-char {
+  color: var(--characterID-YROPUO-color);
+}
+
+/* フリーザ - characterID-qOWicP */
+.character-container-left.characterID-qOWicP .serihu-bubble,
+.character-container-left.characterID-qOWicP .serihu-bubble.thought::before,
+.character-container-left.characterID-qOWicP .serihu-bubble.thought::after,
+.character-container-right.characterID-qOWicP .serihu-bubble,
+.character-container-right.characterID-qOWicP .serihu-bubble.thought::before,
+.character-container-right.characterID-qOWicP .serihu-bubble.thought::after {
+  background-color: var(--characterID-qOWicP-color);
+}
+
+.character-container-left.characterID-qOWicP .serihu-bubble.uniflash,
+.character-container-right.characterID-qOWicP .serihu-bubble.uniflash {
+  background: radial-gradient(var(--characterID-qOWicP-color), var(--characterID-qOWicP-color) 55% 50%,transparent 65%);
+}
+
+.character-container-left.characterID-qOWicP .serihu-bubble.uniflash::before,
+.character-container-right.characterID-qOWicP .serihu-bubble.uniflash::before {
+  background: radial-gradient(var(--characterID-qOWicP-color), var(--characterID-qOWicP-color) 50%,transparent 65%);
+}
+
+.character-container-left.characterID-qOWicP .serihu-bubble::after,
+.character-container-right.characterID-qOWicP .serihu-bubble::after {
+  border-color: var(--characterID-qOWicP-color) transparent transparent;
+}
+
+.character-container-left.characterID-qOWicP .serihu-char,
+.character-container-right.characterID-qOWicP .serihu-char {
+  color: var(--characterID-qOWicP-color);
 }
 
