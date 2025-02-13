@@ -1,7 +1,7 @@
 {
 	"id": "manga-dialogue-render",
 	"name": "Manga Dialogue Render",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"minAppVersion": "0.15.0",
 	"description": "Render your characters dialogues in code blocks into manga-style speech bubbles.",
 	"author": "kumocorn",

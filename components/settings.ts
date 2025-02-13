@@ -6,7 +6,7 @@ import {
 	ButtonComponent,
 	PluginManifest,
 } from "obsidian";
-import { nanoid } from "nanoid";
+import { nanoid } from 'nanoid';
 import MangaDialoguePlugin from "../main";
 import { PluginSettings } from "./types";
 import { loadStylesheet } from "./utils";
