@@ -99,7 +99,8 @@ They are not preinstalled fonts, so you must install your own typeface or change
 
 #####  ✍External characters
 
-Half-width characters are oriented horizontally, so characters such as ! and ? We recommend you to use Unicode `‼` `⁇` `⁈` `⁉` to join two `!  
+Half-width characters are oriented horizontally,  
+so characters such as `!` and `?` We recommend you to use Unicode `‼` `⁇` `⁈` `⁉` to join two `!  
 Use `〰` or `⌇` to join wavy lines.
  
 If you have specified "Shippori Antique" or "GenEi Font", you can use this tool to copy external characters.  
@@ -114,7 +115,7 @@ You can set the appearance and font of the speech bubble.
 Bubble Height and Comment Width must be in units.  
 Enter the font-family name for the font name.
 
-##### ✍Font-family名の確認方法＿How to identify the Font-family name.
+##### ✍How to identify the Font-family name.
 
 It is easy to open Notepad and copy and paste the font name displayed in Format → Font.  
 ![alt text](<docs/Pasted image 20250213235635.png>)
