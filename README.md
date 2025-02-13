@@ -1,8 +1,7 @@
 # Obsidian Manga Dialogue Render
 [English](README.md)  | [日本語](README-JP.md) 
 
-    *English text is machine translated.*
-
+*English text is machine translated.*
 
 This plugin renders character dialogue written in codeblock in a manga-style.  
 ![alt text](<docs/Pasted image 20250213232117.png>)
@@ -79,7 +78,7 @@ The dialogue prefix allows you to specify the shape of the speech bubble.
 | `(` or`)`   | Thought     |
 | `((`or`))`  | Uni-flash |
 
-![[Pasted image 20250213234749.png]]
+![alt text](<docs/Pasted image 20250213234749.png>)
 
 #### Typeface
  
