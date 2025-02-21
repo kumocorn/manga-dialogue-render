@@ -128,6 +128,14 @@ If you add a character to the Character list, you can specify the color of the s
 If the name specified in the property matches the name registered in the list, the color of the bubble will change.  
 In the list, you can change the character's name, specify the bubble color, and remove the character.
 
+#### Required Files
+A special css file is required to use the character list feature.
+1. manually create a folder named `skin` in Your Vault Name/.obsidian/plugins/manga-dialogue-render
+2. store the template file [_color.tpl](https://github.com/kumocorn/manga-dialogue-render/releases/download/v1.0.1/_color.tpl) in the `skin` folder.
+3. add a character to the character list, When you add a character to the character list, `color.css` will be created automatically. Now the color will be applied to speech bubbles. 👍️
+
+Translated with DeepL.com (free version)
+
 ## Many thanks!!
 
 This plugin was created by a person who cannot read and write TypeScript with the help of chatGPT.  
