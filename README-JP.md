@@ -123,6 +123,12 @@ Bubble Height と Comment Width は単位をつけてください。
 プロパティで指定した名前がリストに登録されている名前と一致するとフキダシ色が変わります。  
 リストではキャラクター名の変更、フキダシ色の指定、キャラクターの削除ができます。  
 
+#### 必要なファイル
+キャラクターリスト機能を利用するためには専用のcssファイルが必要となります。
+1. Your Vault Name/.obsidian/plugins/manga-dialogue-render内に`skin`というフォルダーを手動で作成します。
+2. `skin`フォルダー内にテンプレートファイル[_color.tpl](https://github.com/kumocorn/manga-dialogue-render/releases/download/v1.0.1/_color.tpl)を格納してください。
+3. キャラクターリストにキャラクターを追加すると`color.css`が自動的に作られます。これでフキダシに色が適用されます👍️
+
 ## ありがとうございます！！
 このプラグインはTypeScriptの読み書きが出来ない人間がchatGPTの力を借りて作ったものです。  
 バグの修正などは対応できない場合がありますごめんなさい！  
